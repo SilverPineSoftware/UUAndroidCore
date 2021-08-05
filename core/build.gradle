@@ -7,8 +7,8 @@ plugins {
 
 ext {
     PUBLISH_GROUP_ID = 'io.spsw'
-    PUBLISH_VERSION = '0.0.1'
-    PUBLISH_ARTIFACT_ID = 'uu.core'
+    PUBLISH_VERSION = '0.0.2'
+    PUBLISH_ARTIFACT_ID = 'uucore'
 }
 
 
@@ -135,7 +135,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
-        versionName "0.0.1"
+        versionName PUBLISH_VERSION
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
