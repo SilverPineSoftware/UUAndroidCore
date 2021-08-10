@@ -6,126 +6,12 @@ plugins {
 }
 
 ext {
-    PUBLISH_GROUP_ID = 'com.silverpine'
-    PUBLISH_VERSION = '0.0.3'
     PUBLISH_ARTIFACT_ID = 'uu-core'
+    PUBLISH_DESCRIPTION = 'Useful Utilities Core'
+    SCM_MODULE_NAME = 'UUAndroidCore'
 }
 
-
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    if (project.plugins.findPlugin("com.android.library")) {
-        // For Android libraries
-        from android.sourceSets.main.java.srcDirs
-        from android.sourceSets.main.kotlin.srcDirs
-    } else {
-        // For pure Kotlin libraries, in case you have them
-        from sourceSets.main.java.srcDirs
-        from sourceSets.main.kotlin.srcDirs
-    }
-}
-
-/*
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}*/
-
-/*
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += configurations.javadocDeps
-    failOnError false
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-javadoc {
-    if(JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
-}*/
-
-artifacts {
-    archives androidSourcesJar
-}
-
-group = PUBLISH_GROUP_ID
-version = PUBLISH_VERSION
-
-
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                // The coordinates of the library, being set from variables that
-                // we'll set up later
-                groupId PUBLISH_GROUP_ID
-                artifactId PUBLISH_ARTIFACT_ID
-                version PUBLISH_VERSION
-
-                // Two artifacts, the `aar` (or `jar`) and the sources
-                if (project.plugins.findPlugin("com.android.library")) {
-                    from components.release
-                } else {
-                    from components.java
-                }
-
-                artifact androidSourcesJar
-                //artifact javadocJar
-
-                // Mostly self-explanatory metadata
-                pom {
-                    name = PUBLISH_ARTIFACT_ID
-                    description = 'Useful Utilities Android'
-                    url = 'https://github.com/SilverpineSoftware/UUAndroidCore'
-                    licenses {
-                        license {
-                            name = 'MIT License'
-                            url = 'https://github.com/SilverpineSoftware/UUAndroidCore/blob/master/LICENSE'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'ryandevore'
-                            name = 'Ryan DeVore'
-                            email = 'ryan@silverpine.com'
-                        }
-                        // Add all other devs here...
-                    }
-
-                    // Version control info - if you're using GitHub, follow the
-                    // format as seen here
-                    scm {
-                        connection = 'scm:git:github.com/SilverpineSoftware/UUAndroidCore.git'
-                        developerConnection = 'scm:git:ssh://github.com/SilverpineSoftware/UUAndroidCore.git'
-                        url = 'https://github.com/SilverpineSoftware/UUAndroidCore/tree/main'
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    useInMemoryPgpKeys(
-            rootProject.ext["signing.keyId"],
-            rootProject.ext["signing.key"],
-            rootProject.ext["signing.password"],
-    )
-    sign publishing.publications
-}
-
-
+apply from: "../uu-build-common.gradle"
 
 android {
     compileSdkVersion 30
@@ -151,22 +37,15 @@ android {
     }
 }
 
-/*
-configurations {
-    javadocDeps
-}*/
-
 dependencies {
 
+    implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    //implementation 'com.google.android.material:material:1.4.0'
 
     testImplementation 'junit:junit:4.13.2'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
-    //javadocDeps 'androidx.appcompat:appcompat:1.3.1'
 }
 
 
