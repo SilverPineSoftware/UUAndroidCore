@@ -1,15 +1,16 @@
 package com.silverpine.uu.core;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.silverpine.uu.logging.UULog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 
-import com.silverpine.uu.logging.UULog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Useful set of methods for manipulating byte arrays
@@ -22,13 +23,52 @@ public class UUData
      * Extracts a set of bytes from a byte array
      *
      * @param source the source byte array
-     * @param offset starting index to copy
+     * @param index starting index to copy
      * @param count number of bytes to copy
      * @return a byte array, or null if index and count are not in bounds
      */
-    public static @Nullable byte[] subData(final @Nullable byte[] source, final int offset, final int count)
+    public static @Nullable byte[] subData(final @Nullable byte[] source, final int index, final int count)
     {
-        if (source != null && offset >= 0 && count >= 0 && (offset + count) <= source.length)
+        /*
+        guard index >= 0 else
+        {
+            return nil
+        }
+
+        let upperIndex = ((index + count) > self.count) ? self.count : index + count
+
+        guard index <= upperIndex else
+        {
+            return nil
+        }
+
+        */
+
+        if (source == null)
+        {
+            return null;
+        }
+
+        if (index < 0)
+        {
+            return null;
+        }
+
+        int dataLength = source.length;
+
+        int countAvailable = dataLength - index;
+        int actualCount = count;
+
+        if (countAvailable < count)
+        {
+            actualCount = countAvailable;
+        }
+
+        byte[] dest = new byte[actualCount];
+        System.arraycopy(source, index, dest, 0, dest.length);
+        return dest;
+
+        /*if (source != null && offset >= 0 && count >= 0 && (offset + count) <= source.length)
         {
             byte[] dest = new byte[count];
             System.arraycopy(source, offset, dest, 0, count);
@@ -37,7 +77,7 @@ public class UUData
         else
         {
             return null;
-        }
+        }*/
     }
 
     /**
@@ -145,5 +185,26 @@ public class UUData
         }
 
         return result;
+    }
+
+    @NonNull
+    public static ArrayList<byte[]> slice(@NonNull final byte[] data, final int sliceSize)
+    {
+        ArrayList<byte[]> slices = new ArrayList<>();
+
+        int index = 0;
+
+        while (index < data.length)
+        {
+            byte[] slice = subData(data, index, sliceSize);
+            if (slice != null)
+            {
+                slices.add(slice);
+            }
+
+            index += sliceSize;
+        }
+
+        return slices;
     }
 }
