@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,21 +30,6 @@ public class UUData
      */
     public static @Nullable byte[] subData(final @Nullable byte[] source, final int index, final int count)
     {
-        /*
-        guard index >= 0 else
-        {
-            return nil
-        }
-
-        let upperIndex = ((index + count) > self.count) ? self.count : index + count
-
-        guard index <= upperIndex else
-        {
-            return nil
-        }
-
-        */
-
         if (source == null)
         {
             return null;
@@ -55,29 +41,14 @@ public class UUData
         }
 
         int dataLength = source.length;
+        int upperIndex = Math.min((index + count), dataLength);
 
-        int countAvailable = dataLength - index;
-        int actualCount = count;
-
-        if (countAvailable < count)
-        {
-            actualCount = countAvailable;
-        }
-
-        byte[] dest = new byte[actualCount];
-        System.arraycopy(source, index, dest, 0, dest.length);
-        return dest;
-
-        /*if (source != null && offset >= 0 && count >= 0 && (offset + count) <= source.length)
-        {
-            byte[] dest = new byte[count];
-            System.arraycopy(source, offset, dest, 0, count);
-            return dest;
-        }
-        else
+        if (index > upperIndex)
         {
             return null;
-        }*/
+        }
+
+        return Arrays.copyOfRange(source, index, upperIndex);
     }
 
     /**
