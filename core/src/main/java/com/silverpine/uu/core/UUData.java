@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -101,7 +103,7 @@ public class UUData
     {
         ByteArrayOutputStream bos = null;
         ObjectOutputStream oos = null;
-        byte[] result = null;
+        byte[] result;
 
         try
         {
@@ -145,9 +147,8 @@ public class UUData
             result = UUObject.safeCast(type, ois.readObject());
 
         }
-        catch (Exception ex)
+        catch (Exception ignored)
         {
-            result = null;
         }
         finally
         {
@@ -177,5 +178,126 @@ public class UUData
         }
 
         return slices;
+    }
+
+    private static final int UINT8_MASK = (int)0x000000FF;
+    private static final int UINT16_MASK = (int)0x0000FFFF;
+    private static final long UINT32_MASK = 0xFFFFFFFFL;
+    private static final long UINT64_MASK = 0xFFFFFFFFFFFFFFFFL;
+
+    /**
+     * Reads a UInt8 from a byte[] array.
+     *
+     * @param data the data to read from
+     * @param index the index to read from
+     * @return UInt8 value at the index
+     */
+    public static int readUInt8(@NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        return ((int)bb.get(index) & UINT8_MASK);
+    }
+
+    /**
+     * Reads a UInt16 from a byte[] array.
+     *
+     * @param order the byte order to use for reading
+     * @param data the data to read from
+     * @param index the index to read from
+     *
+     * @return UInt16 value at the index
+     */
+    public static int readUInt16(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        return ((int)bb.getShort(index) & UINT16_MASK);
+    }
+
+    /**
+     * Reads a UInt32 from a byte[] array.
+     *
+     * @param order the byte order to use for reading
+     * @param data the data to read from
+     * @param index the index to read from
+     *
+     * @return UInt32 value at the index
+     */
+    public static long readUInt32(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        return ((long)bb.getInt(index) & UINT32_MASK);
+    }
+
+    /**
+     * Reads a UInt64 from a byte[] array.
+     *
+     * @param order ByteOrder order
+     * @param data the data to read from
+     * @param index the index to read from
+     *
+     * @return UInt64 value at the index
+     */
+    public static long readUInt64(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        return ((long)bb.getLong(index) & UINT64_MASK);
+    }
+
+    /**
+     * Reads a UInt8 from a byte[] array.
+     *
+     * @param data the data to read from
+     * @param index the index to read from
+     * @return UInt8 value at the index
+     */
+    public static byte readInt8(@NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        return bb.get(index);
+    }
+
+    /**
+     * Reads a UInt16 from a byte[] array.
+     *
+     * @param order the byte order to use for reading
+     * @param data the data to read from
+     * @param index the index to read from
+     *
+     * @return UInt16 value at the index
+     */
+    public static short readInt16(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        return bb.getShort(index);
+    }
+
+    /**
+     * Reads a Int32 from a byte[] array.
+     *
+     * @param order the byte order to use for reading
+     * @param data the data to read from
+     * @param index the index to read from
+     *
+     * @return Int32 value at the index
+     */
+    public static int readInt32(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        return bb.getInt(index);
+    }
+
+    /**
+     * Reads a Int64 from a byte[] array.
+     *
+     * @param order the byte order to use for reading
+     * @param data the data to read from
+     * @param index the index to read from
+     *
+     * @return Int64 value at the index
+     */
+    public static long readInt64(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        return bb.getLong(index);
     }
 }
