@@ -9,11 +9,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import kotlin.text.Charsets;
 
 /**
  * Useful set of methods for manipulating byte arrays
@@ -490,5 +492,62 @@ public class UUData
         ByteBuffer bb = ByteBuffer.wrap(data).order(order);
         bb.putLong(index, value);
         return Long.BYTES;
+    }
+
+    /**
+     *
+     * Writes a string to a buffer
+     *
+     * @param data the buffer to write to
+     * @param index the index to write to
+     * @param value the value to write
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeData(@NonNull final byte[] data, final int index, @NonNull final byte[] value)
+    {
+        System.arraycopy(value, 0, data, index, value.length);
+        return value.length;
+    }
+
+    /**
+     *
+     * Writes a string to a buffer
+     *
+     * @param data the buffer to write to
+     * @param index the index to write to
+     * @param value the value to write
+     * @param charset the character encoding to use
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeString(@NonNull final byte[] data, final int index, @NonNull final String value, @NonNull final Charset charset)
+    {
+        byte[] buffer = value.getBytes(charset);
+        return writeData(data, index, buffer);
+    }
+
+    /**
+     *
+     * Writes a UTF8 string to a buffer
+     *
+     * @param data the buffer to write to
+     * @param index the index to write to
+     * @param value the value to write
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeUtf8(@NonNull final byte[] data, final int index, @NonNull final String value)
+    {
+        return writeString(data, index, value, Charsets.UTF_8);
     }
 }
