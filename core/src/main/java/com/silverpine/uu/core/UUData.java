@@ -190,6 +190,10 @@ public class UUData
      *
      * @param data the data to read from
      * @param index the index to read from
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
      * @return UInt8 value at the index
      */
     public static int readUInt8(@NonNull final byte[] data, final int index)
@@ -204,6 +208,9 @@ public class UUData
      * @param order the byte order to use for reading
      * @param data the data to read from
      * @param index the index to read from
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
      *
      * @return UInt16 value at the index
      */
@@ -220,6 +227,9 @@ public class UUData
      * @param data the data to read from
      * @param index the index to read from
      *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
      * @return UInt32 value at the index
      */
     public static long readUInt32(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
@@ -235,6 +245,9 @@ public class UUData
      * @param data the data to read from
      * @param index the index to read from
      *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
      * @return UInt64 value at the index
      */
     public static long readUInt64(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
@@ -248,7 +261,12 @@ public class UUData
      *
      * @param data the data to read from
      * @param index the index to read from
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
      * @return UInt8 value at the index
+     *
      */
     public static byte readInt8(@NonNull final byte[] data, final int index)
     {
@@ -262,6 +280,9 @@ public class UUData
      * @param order the byte order to use for reading
      * @param data the data to read from
      * @param index the index to read from
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
      *
      * @return UInt16 value at the index
      */
@@ -278,6 +299,9 @@ public class UUData
      * @param data the data to read from
      * @param index the index to read from
      *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
      * @return Int32 value at the index
      */
     public static int readInt32(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
@@ -293,11 +317,178 @@ public class UUData
      * @param data the data to read from
      * @param index the index to read from
      *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
      * @return Int64 value at the index
      */
     public static long readInt64(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index)
     {
         ByteBuffer bb = ByteBuffer.wrap(data).order(order);
         return bb.getLong(index);
+    }
+
+    /**
+     * Writes a UInt8 at the specified index
+     *
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeUInt8(@NonNull final byte[] data, final int index, final int value)
+    {
+        data[index] = (byte) (value & 0xFF);
+        return Byte.BYTES;
+    }
+
+    /**
+     * Writes a UInt16 at the specified index
+     *
+     * @param order the byte order to use for writing
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeUInt16(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index, final int value)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        bb.putShort(index, (short)(value & 0xFFFF));
+        return Short.BYTES;
+    }
+
+    /**
+     * Writes a UInt32 at the specified index
+     *
+     * @param order the byte order to use for writing
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeUInt32(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index, final long value)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        bb.putInt(index, (int)(value & 0xFFFFFFFFL));
+        return Integer.BYTES;
+    }
+
+    /**
+     * Writes a UInt64 at the specified index
+     *
+     * @param order the byte order to use for writing
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeUInt64(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index, final long value)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        bb.putLong(index, (long)(value & UINT64_MASK));
+        return Long.BYTES;
+    }
+
+    /**
+     * Writes a Int8 at the specified index
+     *
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeInt8(@NonNull final byte[] data, final int index, final byte value)
+    {
+        data[index] = value;
+        return Byte.BYTES;
+    }
+
+    /**
+     * Writes a Int16 at the specified index
+     *
+     * @param order the byte order to use for writing
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeInt16(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index, final short value)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        bb.putShort(index, value);
+        return Short.BYTES;
+    }
+
+    /**
+     * Writes a Int32 at the specified index
+     *
+     * @param order the byte order to use for writing
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeInt32(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index, final int value)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        bb.putInt(index, value);
+        return Integer.BYTES;
+    }
+
+    /**
+     * Writes a Int64 at the specified index
+     *
+     * @param order the byte order to use for writing
+     * @param data the buffer to write
+     * @param index the index to write to
+     * @param value the value to write
+     *
+     * @return the number of bytes written
+     *
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws NullPointerException if data is null
+     *
+     */
+    public static int writeInt64(@NonNull final ByteOrder order, @NonNull final byte[] data, final int index, final long value)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(data).order(order);
+        bb.putLong(index, value);
+        return Long.BYTES;
     }
 }
