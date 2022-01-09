@@ -42,7 +42,7 @@ def getVersionName = { ->
 
     def result = rootVersion.trim()
 
-    if (BUILD_BRANCH != "main")
+    if (BUILD_BRANCH != "\"main\"")
     {
         result += "-SNAPSHOT"
     }
