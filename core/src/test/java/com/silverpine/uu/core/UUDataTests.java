@@ -1158,7 +1158,7 @@ public class UUDataTests
     // MARK: Nibble Tests
 
     @Test
-    public void test_uuHighNibble()
+    public void test_highNibble()
     {
         ArrayList<InputPair<Byte>> testInput = new ArrayList<>();
         testInput.add(new InputPair<>("00", (byte)0));
@@ -1178,7 +1178,7 @@ public class UUDataTests
     }
 
     @Test
-    public void test_uuLowNibble()
+    public void test_lowNibble()
     {
         ArrayList<InputPair<Byte>> testInput = new ArrayList<>();
         testInput.add(new InputPair<>("00", (byte)0));
@@ -1193,6 +1193,86 @@ public class UUDataTests
         {
             byte actual = UUData.lowNibble(td.bytes(), td.index);
             byte expected = td.expected;
+            Assert.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void test_bcd8()
+    {
+        ArrayList<InputPair<Integer>> testInput = new ArrayList<>();
+        testInput.add(new InputPair<>("00", 0));
+        testInput.add(new InputPair<>("12", 12));
+        testInput.add(new InputPair<>("01", 1));
+        testInput.add(new InputPair<>("99", 99));
+        testInput.add(new InputPair<>("CB", -1));
+        testInput.add(new InputPair<>("57abcd1234", 57));
+        testInput.add(new InputPair<>("FF", -1));
+
+        for (InputPair<Integer> td: testInput)
+        {
+            int actual = UUData.bcd8(td.bytes(), td.index);
+            int expected = td.expected;
+            Assert.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void test_bcd16()
+    {
+        ArrayList<InputPair<Integer>> testInput = new ArrayList<>();
+        testInput.add(new InputPair<>("0000", 0));
+        testInput.add(new InputPair<>("1234", 1234));
+        testInput.add(new InputPair<>("0101", 101));
+        testInput.add(new InputPair<>("9999", 9999));
+        testInput.add(new InputPair<>("CBDE", -1));
+        testInput.add(new InputPair<>("5722abcd1234", 5722));
+        testInput.add(new InputPair<>("FFFF", -1));
+
+        for (InputPair<Integer> td: testInput)
+        {
+            int actual = UUData.bcd16(td.bytes(), td.index);
+            int expected = td.expected;
+            Assert.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void test_bcd24()
+    {
+        ArrayList<InputPair<Integer>> testInput = new ArrayList<>();
+        testInput.add(new InputPair<>("000000", 0));
+        testInput.add(new InputPair<>("123456", 123456));
+        testInput.add(new InputPair<>("010101", 10101));
+        testInput.add(new InputPair<>("999999", 999999));
+        testInput.add(new InputPair<>("CBDEBF", -1));
+        testInput.add(new InputPair<>("572295abcd1234", 572295));
+        testInput.add(new InputPair<>("FFFFFF", -1));
+
+        for (InputPair<Integer> td: testInput)
+        {
+            int actual = UUData.bcd24(td.bytes(), td.index);
+            int expected = td.expected;
+            Assert.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void test_bcd32()
+    {
+        ArrayList<InputPair<Integer>> testInput = new ArrayList<>();
+        testInput.add(new InputPair<>("00000000", 0));
+        testInput.add(new InputPair<>("12345678", 12345678));
+        testInput.add(new InputPair<>("01010101", 1010101));
+        testInput.add(new InputPair<>("99999999", 99999999));
+        testInput.add(new InputPair<>("CBDEABCD", -1));
+        testInput.add(new InputPair<>("57229576abcd1234", 57229576));
+        testInput.add(new InputPair<>("FFFFFFFF", -1));
+
+        for (InputPair<Integer> td: testInput)
+        {
+            int actual = UUData.bcd32(td.bytes(), td.index);
+            int expected = td.expected;
             Assert.assertEquals(expected, actual);
         }
     }

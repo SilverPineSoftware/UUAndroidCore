@@ -575,55 +575,84 @@ public class UUData
         return (byte)(value & 0x0F);
     }
 
-    /*
-
-
-    // MARK: BCD Support
-
-    func uuBCD8(at index: Int ) -> UInt8?
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a single byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd8(@NonNull final byte[] data, final int index)
     {
-        guard let highNibble = uuHighNibble(at: index),
-        highNibble <= 9,
-            let lowNibble = uuLowNibble(at: index),
-        lowNibble <= 9 else
+        byte highNibble = highNibble(data, index);
+        byte lowNibble = lowNibble(data, index);
+
+        if (highNibble <= 9 && lowNibble <= 9)
         {
-            return nil
+            return (highNibble * 10) + lowNibble;
         }
 
-        return (highNibble * 10) + lowNibble
+        return -1;
     }
 
-    func uuBCD16(at index: Int) -> UInt16?
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a two byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd16(@NonNull final byte[] data, final int index)
     {
-        guard let data1 = uuBCD8(at: index),
-        let data2 = uuBCD8(at: index + 1) else
+        int data1 = bcd8(data, index);
+        int data2 = bcd8(data, index + 1);
+
+        if (data1 != -1 && data2 != -1)
         {
-            return nil
+            return (data1 * 100) + data2;
         }
 
-        return (UInt16(data1) * 100) + UInt16(data2)
+        return -1;
     }
 
-    func uuBCD24(at index: Int) -> UInt32?
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a three byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd24(@NonNull final byte[] data, final int index)
     {
-        guard let data1 = uuBCD8(at: index),
-        let data2 = uuBCD8(at: index + 1),
-        let data3 = uuBCD8(at: index + 2) else
+        int data1 = bcd8(data, index);
+        int data2 = bcd8(data, index + 1);
+        int data3 = bcd8(data, index + 2);
+
+        if (data1 != -1 && data2 != -1 && data3 != -1)
         {
-            return nil
+            return (data1 * 10000) + (data2 * 100) + data3;
         }
 
-        return (UInt32(data1) * 10000) + (UInt32(data2) * 100) + UInt32(data3)
+        return -1;
     }
 
-    func uuBCD32(at index: Int) -> UInt32?
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a four byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd32(@NonNull final byte[] data, final int index)
     {
-        guard let data1 = uuBCD16(at: index),
-        let data2 = uuBCD16(at: index + 2) else
+        int data1 = bcd16(data, index);
+        int data2 = bcd16(data, index + 2);
+
+        if (data1 != -1 && data2 != -1)
         {
-            return nil
+            return (data1 * 10000) + data2;
         }
 
-        return (UInt32(data1) * 10000) + UInt32(data2)
-    } */
+        return -1;
+    }
 }
