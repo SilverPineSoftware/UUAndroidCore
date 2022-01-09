@@ -1154,4 +1154,46 @@ public class UUDataTests
             Assert.fail("An exception escaped the negative test area: " + error);
         }
     }
+
+    // MARK: Nibble Tests
+
+    @Test
+    public void test_uuHighNibble()
+    {
+        ArrayList<InputPair<Byte>> testInput = new ArrayList<>();
+        testInput.add(new InputPair<>("00", (byte)0));
+        testInput.add(new InputPair<>("12", (byte)1));
+        testInput.add(new InputPair<>("01", (byte)0));
+        testInput.add(new InputPair<>("99", (byte)9));
+        testInput.add(new InputPair<>("CB", (byte)0xC));
+        testInput.add(new InputPair<>("57abcd1234", (byte)5));
+        testInput.add(new InputPair<>("FF", (byte)0xF));
+
+        for (InputPair<Byte> td: testInput)
+        {
+            byte actual = UUData.highNibble(td.bytes(), td.index);
+            byte expected = td.expected;
+            Assert.assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void test_uuLowNibble()
+    {
+        ArrayList<InputPair<Byte>> testInput = new ArrayList<>();
+        testInput.add(new InputPair<>("00", (byte)0));
+        testInput.add(new InputPair<>("12", (byte)2));
+        testInput.add(new InputPair<>("01", (byte)1));
+        testInput.add(new InputPair<>("99", (byte)9));
+        testInput.add(new InputPair<>("CB", (byte)0xB));
+        testInput.add(new InputPair<>("57abcd1234", (byte)7));
+        testInput.add(new InputPair<>("FF", (byte)0xF));
+
+        for (InputPair<Byte> td: testInput)
+        {
+            byte actual = UUData.lowNibble(td.bytes(), td.index);
+            byte expected = td.expected;
+            Assert.assertEquals(expected, actual);
+        }
+    }
 }

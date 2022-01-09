@@ -550,4 +550,80 @@ public class UUData
     {
         return writeString(data, index, value, Charsets.UTF_8);
     }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return the high order nibble (4 bit value, MSB-LSB) at the specified index
+     */
+    public static byte highNibble(@NonNull final byte[] data, final int index)
+    {
+        int value = readUInt8(data, index);
+        return (byte)((((short)(value & 0xFF)) >> 4) & 0x0F);
+    }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return the low order nibble (4 bit value, MSB-LSB) at the specified index
+     */
+    public static byte lowNibble(@NonNull final byte[] data, final int index)
+    {
+        int value = readUInt8(data, index);
+        return (byte)(value & 0x0F);
+    }
+
+    /*
+
+
+    // MARK: BCD Support
+
+    func uuBCD8(at index: Int ) -> UInt8?
+    {
+        guard let highNibble = uuHighNibble(at: index),
+        highNibble <= 9,
+            let lowNibble = uuLowNibble(at: index),
+        lowNibble <= 9 else
+        {
+            return nil
+        }
+
+        return (highNibble * 10) + lowNibble
+    }
+
+    func uuBCD16(at index: Int) -> UInt16?
+    {
+        guard let data1 = uuBCD8(at: index),
+        let data2 = uuBCD8(at: index + 1) else
+        {
+            return nil
+        }
+
+        return (UInt16(data1) * 100) + UInt16(data2)
+    }
+
+    func uuBCD24(at index: Int) -> UInt32?
+    {
+        guard let data1 = uuBCD8(at: index),
+        let data2 = uuBCD8(at: index + 1),
+        let data3 = uuBCD8(at: index + 2) else
+        {
+            return nil
+        }
+
+        return (UInt32(data1) * 10000) + (UInt32(data2) * 100) + UInt32(data3)
+    }
+
+    func uuBCD32(at index: Int) -> UInt32?
+    {
+        guard let data1 = uuBCD16(at: index),
+        let data2 = uuBCD16(at: index + 2) else
+        {
+            return nil
+        }
+
+        return (UInt32(data1) * 10000) + UInt32(data2)
+    } */
 }
