@@ -550,4 +550,109 @@ public class UUData
     {
         return writeString(data, index, value, Charsets.UTF_8);
     }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return the high order nibble (4 bit value, MSB-LSB) at the specified index
+     */
+    public static byte highNibble(@NonNull final byte[] data, final int index)
+    {
+        int value = readUInt8(data, index);
+        return (byte)((((short)(value & 0xFF)) >> 4) & 0x0F);
+    }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return the low order nibble (4 bit value, MSB-LSB) at the specified index
+     */
+    public static byte lowNibble(@NonNull final byte[] data, final int index)
+    {
+        int value = readUInt8(data, index);
+        return (byte)(value & 0x0F);
+    }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a single byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd8(@NonNull final byte[] data, final int index)
+    {
+        byte highNibble = highNibble(data, index);
+        byte lowNibble = lowNibble(data, index);
+
+        if (highNibble <= 9 && lowNibble <= 9)
+        {
+            return (highNibble * 10) + lowNibble;
+        }
+
+        return -1;
+    }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a two byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd16(@NonNull final byte[] data, final int index)
+    {
+        int data1 = bcd8(data, index);
+        int data2 = bcd8(data, index + 1);
+
+        if (data1 != -1 && data2 != -1)
+        {
+            return (data1 * 100) + data2;
+        }
+
+        return -1;
+    }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a three byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd24(@NonNull final byte[] data, final int index)
+    {
+        int data1 = bcd8(data, index);
+        int data2 = bcd8(data, index + 1);
+        int data3 = bcd8(data, index + 2);
+
+        if (data1 != -1 && data2 != -1 && data3 != -1)
+        {
+            return (data1 * 10000) + (data2 * 100) + data3;
+        }
+
+        return -1;
+    }
+
+    /**
+     *
+     * @param data the buffer to read from
+     * @param index the index to read from
+     * @return a four byte binary coded decimal, or -1 if parsing fails
+     *
+     */
+    public static int bcd32(@NonNull final byte[] data, final int index)
+    {
+        int data1 = bcd16(data, index);
+        int data2 = bcd16(data, index + 2);
+
+        if (data1 != -1 && data2 != -1)
+        {
+            return (data1 * 10000) + data2;
+        }
+
+        return -1;
+    }
 }
