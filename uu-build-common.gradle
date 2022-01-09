@@ -37,15 +37,16 @@ ext {
 }
 
 def getVersionName = { ->
-    def rootVersion = "$version"
+    def rootVersion = "$rootVersion"
     project.logger.lifecycle("rootVersion: $rootVersion")
 
     def result = rootVersion.trim()
 
-//    if (BUILD_BRANCH != "\"main\"")
-//    {
-//        result += "-SNAPSHOT"
-//    }
+    def buildSnapshot = "$buildSnapshot"
+    if (buildSnapshot.toBoolean())
+    {
+        result += "-SNAPSHOT"
+    }
 
     project.logger.lifecycle("versionName: $result")
     return result
@@ -96,6 +97,9 @@ ext {
 }
 
 group = PUBLISH_GROUP_ID
+version = BUILD_VERSION
+
+project.logger.lifecycle("version: $version")
 
 android {
 
