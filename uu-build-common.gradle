@@ -42,10 +42,11 @@ def getVersionName = { ->
 
     def result = rootVersion.trim()
 
-    if (BUILD_BRANCH != "\"main\"")
-    {
-        result += "-SNAPSHOT"
-    }
+//    if (BUILD_BRANCH != "\"main\"")
+//    {
+//        result += "-SNAPSHOT"
+//    }
+
     project.logger.lifecycle("versionName: $result")
     return result
 }
