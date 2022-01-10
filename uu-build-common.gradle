@@ -36,22 +36,6 @@ ext {
     BUILD_BRANCH = getBuildBranch()
 }
 
-def getVersionName = { ->
-    def rootVersion = "$rootVersion"
-    project.logger.lifecycle("rootVersion: $rootVersion")
-
-    def result = rootVersion.trim()
-
-    def buildSnapshot = "$buildSnapshot"
-    if (buildSnapshot.toBoolean())
-    {
-        result += "-SNAPSHOT"
-    }
-
-    project.logger.lifecycle("versionName: $result")
-    return result
-}
-
 def getBuildCommitHash = { ->
 
     def val = null
@@ -91,13 +75,12 @@ def getBuildDate = { ->
 
 ext {
     PUBLISH_GROUP_ID = 'com.silverpine.uu'
-    BUILD_VERSION = getVersionName()
+    BUILD_VERSION = version
     BUILD_COMMIT_HASH = getBuildCommitHash()
     BUILD_DATE = getBuildDate()
 }
 
 group = PUBLISH_GROUP_ID
-version = BUILD_VERSION
 
 project.logger.lifecycle("version: $version")
 
