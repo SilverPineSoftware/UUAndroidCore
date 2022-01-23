@@ -80,7 +80,7 @@ public class UUError implements Parcelable
         return underlyingError;
     }
 
-    protected void addUserInfo(@NonNull Object key, @NonNull Object value)
+    public void addUserInfo(@NonNull Object key, @NonNull Object value)
     {
         if (userInfo == null)
         {
@@ -108,12 +108,12 @@ public class UUError implements Parcelable
         return UUJson.safeGetString(userInfo, USER_INFO_KEY_LOCALIZED_RECOVERY_SUGGESTION);
     }
 
-    protected void setErrorDescription(@Nullable final String description)
+    public void setErrorDescription(@Nullable final String description)
     {
         addUserInfo(USER_INFO_KEY_LOCALIZED_DESCRIPTION, description);
     }
 
-    protected void setRecoverySuggestion(@Nullable final String recoverySuggestion)
+    public void setRecoverySuggestion(@Nullable final String recoverySuggestion)
     {
         addUserInfo(USER_INFO_KEY_LOCALIZED_RECOVERY_SUGGESTION, recoverySuggestion);
     }
