@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.silverpine.uu.core.BuildConfig;
 import com.silverpine.uu.core.UUWorkerThread;
 
 import java.io.PrintWriter;
@@ -22,12 +23,12 @@ import androidx.annotation.Nullable;
  */
 public class UULog
 {
-    public static final boolean LOGGING_ENABLED = false; //BuildConfig.DEBUG;
+    public static final boolean LOGGING_ENABLED = BuildConfig.DEBUG;
     private static final String NEW_LINE = "\n";
     private static final String LOG_TAG = "UULog";
     private static final int LINE_LENGTH = 4000;
 
-    private static UUWorkerThread workerThread = new UUWorkerThread("UULog");
+    private static final UUWorkerThread workerThread = new UUWorkerThread("UULog");
 
     private UULog()
     {
