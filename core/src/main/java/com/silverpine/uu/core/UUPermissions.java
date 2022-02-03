@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 
 import com.silverpine.uu.logging.UULog;
 
@@ -12,56 +13,73 @@ import java.util.HashMap;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 /**
  * Helper class for requesting runtime permissions in Android 6.0 and up
  *
  * Example usage:
  *
  * UUPermissions.requestPermissions(this, "android.permission.ACCESS_FINE_LOCATION", 1234, new UUPermissions.UUPermissionDelegate()
-   {
-       @Override
-       public void onPermissionRequestComplete(String permission, boolean granted)
-       {
-            if (granted)
-            {
-                // Do something with the permission
-            }
-            else
-            {
-                // Handle the error
-            }
-       }
-   });
+ {
+ `@Override`
+ public void onPermissionRequestComplete(String permission, boolean granted)
+ {
+ if (granted)
+ {
+ // Do something with the permission
+ }
+ else
+ {
+ // Handle the error
+ }
+ }
+ });
 
 
  Step 2:  Handle onRequestPermissionsResult in your activity and pass the result to the permissions manager
 
- @Override
+ `@Override`
  public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
  {
-    boolean handled = UUPermissions.handleRequestPermissionsResult(this, requestCode, permissions, grantResults);
-    if (!handled)
-    {
-        // This permission request didn't come from UUPermissions
-    }
+ boolean handled = UUPermissions.handleRequestPermissionsResult(this, requestCode, permissions, grantResults);
+ if (!handled)
+ {
+ // This permission request didn't come from UUPermissions
+ }
  }
 
  *
  */
 public class UUPermissions
 {
-    private static final HashMap<Integer, UUPermissionDelegate> callbacks = new HashMap<>();
+    private static final HashMap<Integer, UUMultiplePermissionDelegate> callbacks = new HashMap<>();
 
-    public interface UUPermissionDelegate
+    public interface UUSinglePermissionDelegate
     {
         void onPermissionRequestComplete(String permission, boolean granted);
+    }
+
+    public interface UUMultiplePermissionDelegate
+    {
+        void onPermissionRequestComplete(HashMap<String, Boolean> results);
     }
 
     public static boolean hasPermission(final Context context, final String permission)
     {
         int permissionCheck = ContextCompat.checkSelfPermission(context, permission);
         return (permissionCheck == PackageManager.PERMISSION_GRANTED);
+    }
+
+    public static boolean hasAllPermissions(final Context context, final String[] permissions)
+    {
+        for (String permission: permissions)
+        {
+            if (!hasPermission(context, permission))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static boolean hasEverRequestedPermission(final Context context, final String permission)
@@ -78,13 +96,14 @@ public class UUPermissions
         prefsEditor.apply();
     }
 
-
-
     public static boolean canRequestPermission(@NonNull final Activity activity, @NonNull final String permission)
     {
         try
         {
-            return !hasEverRequestedPermission(activity, permission) || activity.shouldShowRequestPermissionRationale(permission);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                return !hasEverRequestedPermission(activity, permission) || activity.shouldShowRequestPermissionRationale(permission);
+            }
         }
         catch (Exception ex)
         {
@@ -94,39 +113,84 @@ public class UUPermissions
         return true;
     }
 
-
-
-    public static void requestPermissions(final Activity activity, final String permission, final int requestId, final UUPermissionDelegate delegate)
+    public static boolean canRequestAllPermissions(@NonNull final Activity activity, final String[] permissions)
     {
-        boolean hasPermission = hasPermission(activity, permission);
-        if (hasPermission)
+        boolean canRequestAll = true;
+        for (String p: permissions)
         {
-            safeNotifyDelegate(delegate, permission, true);
+            if (!canRequestPermission(activity, p))
+            {
+                canRequestAll = false;
+                break;
+            }
+        }
+
+        return canRequestAll;
+    }
+
+    public static void requestPermissions(final Activity activity, final String permission, final int requestId, final UUSinglePermissionDelegate delegate)
+    {
+        requestMultiplePermissions(activity, new String[]{permission}, requestId, results ->
+        {
+            boolean granted = false;
+            if (results != null)
+            {
+                Boolean result = results.get(permission);
+                if (result != null)
+                {
+                    granted = result;
+                }
+            }
+
+            safeNotifyDelegate(delegate, permission, granted);
+        });
+    }
+
+    public static void requestMultiplePermissions(final Activity activity, final String[] permissions, final int requestId, final UUMultiplePermissionDelegate delegate)
+    {
+        if (hasAllPermissions(activity, permissions))
+        {
+            HashMap<String,Boolean> results = new HashMap<>();
+            for (String p: permissions)
+            {
+                results.put(p, Boolean.TRUE);
+            }
+
+            safeNotifyDelegate(delegate, results);
             removeDelegate(requestId);
         }
         else
         {
             // Wait for the results
             saveDelegate(delegate, requestId);
-            ActivityCompat.requestPermissions(activity, new String[] { permission }, requestId);
+            ActivityCompat.requestPermissions(activity, permissions, requestId);
         }
+
     }
 
-    public static boolean handleRequestPermissionsResult(final Activity activity, int requestCode, String[] permissions, int[] grantResults)
+    public static boolean handleRequestPermissionsResult(final Activity activity, int requestCode, String permissions[], int[] grantResults)
     {
         try
         {
-            UUPermissionDelegate delegate = null;
+            UUMultiplePermissionDelegate delegate = null;
 
             if (callbacks.containsKey(requestCode))
             {
                 delegate = callbacks.get(requestCode);
-                for (int i = 0; i < permissions.length; i++)
+
+                if (permissions.length == grantResults.length)
                 {
-                    String permission = permissions[i];
-                    setHasRequestedPermission(activity, permission);
-                    int result = grantResults[i];
-                    safeNotifyDelegate(delegate, permission, (result == PackageManager.PERMISSION_GRANTED));
+                    HashMap<String, Boolean> results = new HashMap<>();
+
+                    for (int i = 0; i < permissions.length; i++)
+                    {
+                        String permission = permissions[i];
+                        setHasRequestedPermission(activity, permission);
+                        int result = grantResults[i];
+                        results.put(permission, (result == PackageManager.PERMISSION_GRANTED));
+                    }
+
+                    safeNotifyDelegate(delegate, results);
                 }
 
                 removeDelegate(requestCode);
@@ -141,7 +205,7 @@ public class UUPermissions
         return false;
     }
 
-    private static synchronized void saveDelegate(final UUPermissionDelegate delegate, final Integer requestId)
+    private static synchronized void saveDelegate(final UUMultiplePermissionDelegate delegate, final Integer requestId)
     {
         try
         {
@@ -160,7 +224,10 @@ public class UUPermissions
     {
         try
         {
-            callbacks.remove(requestId);
+            if (callbacks.containsKey(requestId))
+            {
+                callbacks.remove(requestId);
+            }
         }
         catch (Exception ex)
         {
@@ -168,13 +235,28 @@ public class UUPermissions
         }
     }
 
-    private static void safeNotifyDelegate(final UUPermissionDelegate delegate, final String permission, final boolean granted)
+    private static void safeNotifyDelegate(final UUSinglePermissionDelegate delegate, final String permission, final boolean granted)
     {
         try
         {
             if (delegate != null)
             {
                 delegate.onPermissionRequestComplete(permission, granted);
+            }
+        }
+        catch (Exception ex)
+        {
+            UULog.error(UUPermissions.class, "safeNotifyDelegate", ex);
+        }
+    }
+
+    private static void safeNotifyDelegate(final UUMultiplePermissionDelegate delegate, final HashMap<String, Boolean> results)
+    {
+        try
+        {
+            if (delegate != null)
+            {
+                delegate.onPermissionRequestComplete(results);
             }
         }
         catch (Exception ex)
